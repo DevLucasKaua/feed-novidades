@@ -15,6 +15,9 @@ Content-Type: application/json
 ### Seguir loja (cliente 3 não segue nenhuma loja no seed)
 POST {{base}}/clientes/3/seguindo/5
 
+### Deixar de seguir loja (cliente 2 segue a loja 4 no seed)
+DELETE {{base}}/clientes/2/seguindo/4
+
 ### Publicar novidade com preço
 POST {{base}}/lojas/5/novidades
 Content-Type: application/json
