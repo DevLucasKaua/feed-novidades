@@ -4,7 +4,7 @@ API REST em que clientes seguem lojas e acompanham, num feed, as novidades que e
 
 ## Como rodar
 
-Pré-requisitos: Node.js 22.9 ou superior e Docker com Compose.
+Pré-requisitos: Node.js 22.12 ou superior e Docker com Compose.
 
 ```bash
 cp .env.example .env
