@@ -88,6 +88,14 @@ curl 'localhost:3000/clientes/3/feed?limite=1'
 }
 ```
 
+### `DELETE /clientes/{id}/seguindo/{lojaId}`
+
+```bash
+curl -X DELETE localhost:3000/clientes/3/seguindo/5
+```
+
+`204`, sem corpo. Retorna 404 se o cliente não segue a loja, inclusive ao repetir a chamada, para o mesmo tratamento valer quando o cliente ou a loja não existem.
+
 ### Erros
 
 Toda resposta de erro tem o mesmo formato, inclusive rota inexistente e JSON malformado:
@@ -177,7 +185,7 @@ Pontos que o enunciado deixa abertos:
 
 ## O que ficou de fora e o que faria com mais tempo
 
-Os diferenciais do enunciado estão nas [issues](https://github.com/DevLucasKaua/feed-novidades/issues?q=label%3Adiferencial): deixar de seguir, paginação por cursor, OpenAPI e CI.
+Os diferenciais pendentes estão nas [issues](https://github.com/DevLucasKaua/feed-novidades/issues?q=label%3Adiferencial): paginação por cursor e OpenAPI.
 
 Limites conhecidos e próximos passos:
 
