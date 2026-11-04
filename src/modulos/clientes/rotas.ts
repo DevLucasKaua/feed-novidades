@@ -1,7 +1,7 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import { seguirParams, textoObrigatorio } from '../../http/schemas.js';
-import { criarCliente, seguirLoja } from './servico.js';
+import { criarCliente, deixarDeSeguirLoja, seguirLoja } from './servico.js';
 
 const novoCliente = z.object({
   nome: textoObrigatorio('nome'),
@@ -18,5 +18,14 @@ export const rotasClientes: FastifyPluginAsyncZod = async (app) => {
     { schema: { params: seguirParams } },
     async (request, reply) =>
       reply.status(201).send(await seguirLoja(request.params.id, request.params.lojaId)),
+  );
+
+  app.delete(
+    '/clientes/:id/seguindo/:lojaId',
+    { schema: { params: seguirParams } },
+    async (request, reply) => {
+      await deixarDeSeguirLoja(request.params.id, request.params.lojaId);
+      return reply.status(204).send();
+    },
   );
 };

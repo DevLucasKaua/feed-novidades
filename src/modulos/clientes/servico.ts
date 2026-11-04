@@ -1,3 +1,4 @@
+import { and, eq } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { comRestricoes } from '../../db/restricoes.js';
 import { clientes, seguindo } from '../../db/schema.js';
@@ -20,4 +21,12 @@ export async function seguirLoja(clienteId: number, lojaId: number) {
     },
   );
   return seguimento;
+}
+
+export async function deixarDeSeguirLoja(clienteId: number, lojaId: number) {
+  const removidos = await db
+    .delete(seguindo)
+    .where(and(eq(seguindo.clienteId, clienteId), eq(seguindo.lojaId, lojaId)))
+    .returning();
+  if (!removidos.length) throw naoEncontrado('Cliente não segue esta loja');
 }
