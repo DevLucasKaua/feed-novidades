@@ -15,7 +15,7 @@ npm run dev
 
 A API sobe em `http://localhost:3000` e aplica as migrations sozinha ao iniciar.
 
-Para ter dados de exemplo, rode `npm run seed` em outro terminal. O comando **apaga os dados do banco de desenvolvimento** e cria 5 lojas, 3 clientes e 25 novidades. A cliente 1 segue as lojas 1, 2 e 3, e o cliente 3 não segue nenhuma.
+Para ter dados de exemplo, rode `npm run seed` em outro terminal. O comando **apaga os dados do banco de desenvolvimento** e cria 5 lojas, 3 clientes e 25 novidades. O cliente 1 segue as lojas 1, 2 e 3, e o cliente 3 não segue nenhuma.
 
 ## Como rodar os testes
 
@@ -29,7 +29,7 @@ Os testes são de integração contra PostgreSQL real, num banco `feed_novidades
 
 ## Endpoints
 
-O arquivo [`requests.http`](requests.http) tem todas as chamadas, inclusive de erro, prontas para rodar no VS Code (extensão REST Client) ou nas IDEs JetBrains. Os exemplos abaixo consideram o banco com seed.
+O arquivo [`requests.http`](requests.http) tem todas as chamadas, inclusive de erro, prontas para rodar no VS Code (extensão REST Client) ou nas IDEs JetBrains. Os exemplos abaixo consideram o banco recém populado pelo seed e chamadas feitas nesta ordem.
 
 ### `POST /lojas`
 
@@ -142,7 +142,7 @@ Medições num notebook, com PostgreSQL 17 em Docker, 2 mil lojas, 150 mil clien
 | --- | --- |
 | Feed de cliente que segue 31 lojas | 5 ms (mediana), 8 ms (p95) |
 | Feed de cliente que segue 2 mil lojas | 88 ms (mediana), 105 ms (p95) |
-| Mesmo feed de 31 lojas com `JOIN` simples, em execução única | 170 ms, lendo 46.758 novidades em vez de 620 |
+| Mesmo feed de 31 lojas com `JOIN` simples, em execução única e sem cache aquecido | 170 ms, lendo 46.758 novidades em vez de 620 |
 | Publicar em loja com 100 mil seguidores | 4 ms |
 | Copiar uma novidade para 100 mil feeds, em execução única | 377 ms por publicação |
 
