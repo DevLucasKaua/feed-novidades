@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { registrarTratamentoDeErros } from './http/errors.js';
 import { rotasClientes } from './modulos/clientes/rotas.js';
+import { rotasFeed } from './modulos/feed/rotas.js';
 import { rotasLojas } from './modulos/lojas/rotas.js';
 
 export function criarApp() {
@@ -13,6 +14,7 @@ export function criarApp() {
 
   app.register(rotasLojas);
   app.register(rotasClientes);
+  app.register(rotasFeed);
 
   return app;
 }
