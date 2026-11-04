@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['22.12', '26']
+        node: ["22.12", "26"]
     services:
       db:
         image: postgres:17-alpine
