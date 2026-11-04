@@ -1,0 +1,49 @@
+@base = http://localhost:3000
+
+### Criar loja
+POST {{base}}/lojas
+Content-Type: application/json
+
+{ "nome": "Loja Azul" }
+
+### Criar cliente
+POST {{base}}/clientes
+Content-Type: application/json
+
+{ "nome": "Dani Rocha", "email": "dani@exemplo.com" }
+
+### Seguir loja (cliente 3 não segue nenhuma loja no seed)
+POST {{base}}/clientes/3/seguindo/5
+
+### Publicar novidade com preço
+POST {{base}}/lojas/5/novidades
+Content-Type: application/json
+
+{ "texto": "Ração em promoção", "preco": 79.9 }
+
+### Publicar novidade sem preço
+POST {{base}}/lojas/5/novidades
+Content-Type: application/json
+
+{ "texto": "Live hoje às 20h" }
+
+### Feed com limite padrão (20)
+GET {{base}}/clientes/1/feed
+
+### Feed com limite informado
+GET {{base}}/clientes/1/feed?limite=5
+
+### Erro 422: limite acima do máximo
+GET {{base}}/clientes/1/feed?limite=51
+
+### Erro 404: cliente inexistente
+GET {{base}}/clientes/999/feed
+
+### Erro 409: seguir de novo a mesma loja
+POST {{base}}/clientes/1/seguindo/1
+
+### Erro 422: texto vazio e preço zero
+POST {{base}}/lojas/1/novidades
+Content-Type: application/json
+
+{ "texto": "", "preco": 0 }
