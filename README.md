@@ -102,15 +102,15 @@ Toda resposta de erro tem o mesmo formato, inclusive rota inexistente e JSON mal
 }
 ```
 
-| Status | Código | Quando |
-| --- | --- | --- |
-| 400 | `REQUISICAO_INVALIDA` | JSON malformado |
-| 404 | `NAO_ENCONTRADO`, `ROTA_NAO_ENCONTRADA` | Recurso ou rota inexistente |
-| 409 | `CONFLITO` | E-mail repetido ou loja já seguida |
-| 413 | `CORPO_MUITO_GRANDE` | Corpo acima de 1 MB |
-| 415 | `TIPO_NAO_SUPORTADO` | Content-Type diferente de JSON |
-| 422 | `VALIDACAO` | Valor inválido no corpo, na rota ou na query |
-| 500 | `ERRO_INTERNO` | Falha inesperada, sem expor detalhes |
+| Status | Código                                  | Quando                                       |
+| ------ | --------------------------------------- | -------------------------------------------- |
+| 400    | `REQUISICAO_INVALIDA`                   | JSON malformado                              |
+| 404    | `NAO_ENCONTRADO`, `ROTA_NAO_ENCONTRADA` | Recurso ou rota inexistente                  |
+| 409    | `CONFLITO`                              | E-mail repetido ou loja já seguida           |
+| 413    | `CORPO_MUITO_GRANDE`                    | Corpo acima de 1 MB                          |
+| 415    | `TIPO_NAO_SUPORTADO`                    | Content-Type diferente de JSON               |
+| 422    | `VALIDACAO`                             | Valor inválido no corpo, na rota ou na query |
+| 500    | `ERRO_INTERNO`                          | Falha inesperada, sem expor detalhes         |
 
 ## Estrutura de pastas
 
@@ -138,13 +138,13 @@ O que pesa na leitura é quantas lojas o cliente segue, e esse número é pequen
 
 Medições num notebook, com PostgreSQL 17 em Docker, 2 mil lojas, 150 mil clientes, 4,5 milhões de relações de seguir e 3 milhões de novidades, sendo uma das lojas com 100 mil seguidores. O feed foi medido com 100 execuções do serviço, com `limite=20`:
 
-| Cenário | Resultado |
-| --- | --- |
-| Feed de cliente que segue 31 lojas | 5 ms (mediana), 8 ms (p95) |
-| Feed de cliente que segue 2 mil lojas | 88 ms (mediana), 105 ms (p95) |
+| Cenário                                                                           | Resultado                                    |
+| --------------------------------------------------------------------------------- | -------------------------------------------- |
+| Feed de cliente que segue 31 lojas                                                | 5 ms (mediana), 8 ms (p95)                   |
+| Feed de cliente que segue 2 mil lojas                                             | 88 ms (mediana), 105 ms (p95)                |
 | Mesmo feed de 31 lojas com `JOIN` simples, em execução única e sem cache aquecido | 170 ms, lendo 46.758 novidades em vez de 620 |
-| Publicar em loja com 100 mil seguidores | 4 ms |
-| Copiar uma novidade para 100 mil feeds, em execução única | 377 ms por publicação |
+| Publicar em loja com 100 mil seguidores                                           | 4 ms                                         |
+| Copiar uma novidade para 100 mil feeds, em execução única                         | 377 ms por publicação                        |
 
 ### Banco
 
