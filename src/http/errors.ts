@@ -16,8 +16,7 @@ export class ErroApi extends Error {
   }
 }
 
-export const naoEncontrado = (recurso: string) =>
-  new ErroApi(404, 'NAO_ENCONTRADO', `${recurso} não encontrado(a)`);
+export const naoEncontrado = (mensagem: string) => new ErroApi(404, 'NAO_ENCONTRADO', mensagem);
 
 export const conflito = (mensagem: string) => new ErroApi(409, 'CONFLITO', mensagem);
 

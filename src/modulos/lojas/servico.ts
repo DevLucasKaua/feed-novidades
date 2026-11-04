@@ -17,7 +17,7 @@ export async function publicarNovidade(
       .insert(novidades)
       .values({ lojaId, texto, preco: preco?.toFixed(2) })
       .returning(),
-    { novidades_loja_id_lojas_id_fk: naoEncontrado('Loja') },
+    { novidades_loja_id_lojas_id_fk: naoEncontrado('Loja não encontrada') },
   );
   return novidade;
 }

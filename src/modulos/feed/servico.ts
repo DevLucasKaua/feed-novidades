@@ -13,7 +13,7 @@ export async function obterFeed(clienteId: number, limite: number) {
     .select({ id: clientes.id })
     .from(clientes)
     .where(eq(clientes.id, clienteId));
-  if (!cliente) throw naoEncontrado('Cliente');
+  if (!cliente) throw naoEncontrado('Cliente não encontrado');
 
   // O LATERAL lê só as mais recentes de cada loja pelo índice composto, então o custo depende
   // de quantas lojas o cliente segue, não do histórico nem dos seguidores da loja. A loja entra

@@ -15,8 +15,8 @@ export async function seguirLoja(clienteId: number, lojaId: number) {
     db.insert(seguindo).values({ clienteId, lojaId }).returning(),
     {
       seguindo_pk: conflito('Cliente já segue esta loja'),
-      seguindo_cliente_id_clientes_id_fk: naoEncontrado('Cliente'),
-      seguindo_loja_id_lojas_id_fk: naoEncontrado('Loja'),
+      seguindo_cliente_id_clientes_id_fk: naoEncontrado('Cliente não encontrado'),
+      seguindo_loja_id_lojas_id_fk: naoEncontrado('Loja não encontrada'),
     },
   );
   return seguimento;
