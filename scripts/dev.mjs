@@ -32,9 +32,13 @@ async function primeiraPortaLivre(porta) {
   return (await portaLivre(porta)) ? porta : primeiraPortaLivre(porta + 1);
 }
 
+let encerrando = false;
+
 function encerrar(codigo = 0) {
-  for (const processo of processos) processo.kill('SIGTERM');
+  if (encerrando) return;
+  encerrando = true;
   process.exitCode = codigo;
+  for (const processo of processos) processo.kill('SIGTERM');
 }
 
 function iniciar(args) {
@@ -57,16 +61,27 @@ if (!existsSync('web/node_modules')) {
 
 iniciar(['run', 'dev:api']);
 const apiNoAr = await esperar(`${urlDaApi}/documentation/json`, 60);
-if (!apiNoAr) {
+if (!apiNoAr && !encerrando) {
   console.log('\nA API ainda não respondeu. Confira se o banco está no ar: docker compose up -d\n');
 }
 
 const portaDaInterface = await primeiraPortaLivre(5173);
 const urlDaInterface = `http://localhost:${portaDaInterface}`;
-iniciar(['run', 'web', '--', '--port', String(portaDaInterface), '--strictPort', '--open']);
-await esperar(urlDaInterface, 20);
+iniciar([
+  '--prefix',
+  'web',
+  'run',
+  'dev',
+  '--',
+  '--port',
+  String(portaDaInterface),
+  '--strictPort',
+  '--open',
+]);
+const interfaceNoAr = await esperar(urlDaInterface, 20);
 
-console.log(`
+if (interfaceNoAr && !encerrando) {
+  console.log(`
   Feed de Novidades
 
   Interface     ${urlDaInterface}
@@ -75,3 +90,4 @@ console.log(`
 
   Ctrl+C encerra tudo.
 `);
+}
