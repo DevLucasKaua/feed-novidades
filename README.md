@@ -139,6 +139,7 @@ src/
   modulos/     lojas, clientes e feed, cada um com rotas.ts e servico.ts
 drizzle/       migrations SQL versionadas
 test/          testes de integração e helpers
+.github/       workflow de CI
 ```
 
 Rotas cuidam de HTTP e validação. Serviços cuidam das regras e do banco. Seguir fica em `clientes` e publicar fica em `lojas`, acompanhando o prefixo da rota.
@@ -199,12 +200,11 @@ O horário do cursor é lido do banco como texto porque o PostgreSQL guarda micr
 
 ## O que ficou de fora e o que faria com mais tempo
 
-Os quatro diferenciais do enunciado foram feitos: deixar de seguir, paginação por cursor, OpenAPI e CI.
+Os quatro diferenciais do enunciado foram feitos: deixar de seguir, paginação por cursor, OpenAPI e CI. Também incluí encerramento gracioso, para um deploy não interromper requisições em andamento: ao receber `SIGTERM`, a API termina o que está atendendo e fecha a conexão com o banco.
 
 Limites conhecidos e próximos passos:
 
 - **Cliente que segue muitas lojas:** o custo cresce com esse número, como mostra a medição de 88 ms. Se isso virar um caso real, os caminhos são um limite de lojas seguidas ou um cache curto do feed.
 - **Migrations ao subir a API:** simples para este projeto. Em produção com várias instâncias, eu rodaria como etapa do deploy.
-- **Encerramento gracioso:** o servidor não trata `SIGTERM`, então requisições em andamento podem ser interrompidas num deploy.
 - **Tamanho de `nome`:** o enunciado não define máximo, e o único teto hoje é o limite de 1 MB do corpo.
 - **Observabilidade e proteção:** métricas, rate limit e autenticação, esta última fora do escopo do desafio.
