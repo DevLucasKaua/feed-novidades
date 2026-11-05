@@ -4,11 +4,13 @@ API REST em que clientes seguem lojas e acompanham, num feed, as novidades que e
 
 O projeto tem a API, que é a entrega principal, e uma interface opcional para ver tudo funcionando.
 
-| O que                          | Endereço                              | Como subir     |
-| ------------------------------ | ------------------------------------- | -------------- |
-| API                            | `http://localhost:3000`               | `npm run dev`  |
-| Documentação interativa da API | `http://localhost:3000/documentation` | sobe com a API |
-| Interface de demonstração      | `http://localhost:5173`               | `npm run web`  |
+| O que                          | Endereço                              |
+| ------------------------------ | ------------------------------------- |
+| Interface de demonstração      | `http://localhost:5173`               |
+| API                            | `http://localhost:3000`               |
+| Documentação interativa da API | `http://localhost:3000/documentation` |
+
+Tudo sobe com um só comando, `npm run dev`.
 
 ![Painel da interface de demonstração](docs/interface-painel.png)
 
@@ -23,22 +25,15 @@ npm ci
 npm run dev
 ```
 
-A API sobe em `http://localhost:3000` e aplica as migrations sozinha ao iniciar. A documentação interativa fica em `http://localhost:3000/documentation`, e a especificação OpenAPI em `/documentation/json`.
+O `npm run dev` sobe a API e a interface, instala o que faltar na interface, abre o navegador e mostra os endereços no terminal. As migrations são aplicadas sozinhas ao iniciar. `Ctrl+C` encerra tudo.
+
+Para subir só a API, use `npm run dev:api`. A especificação OpenAPI fica em `/documentation/json`.
 
 Para ter dados de exemplo, rode `npm run seed` em outro terminal. O comando **apaga os dados do banco de desenvolvimento** e cria 5 lojas, 3 clientes e 25 novidades. O cliente 1 segue as lojas 1, 2 e 3, e o cliente 3 não segue nenhuma.
 
 ## Interface de demonstração
 
-Uma tela para ver a API funcionando de ponta a ponta. Ela é opcional e não altera a API.
-
-Deixe a API rodando, conforme a seção anterior, e em **outro terminal**:
-
-```bash
-npm --prefix web ci
-npm run web
-```
-
-Depois abra `http://localhost:5173`. Se essa porta estiver ocupada, o Vite usa a seguinte e mostra o endereço no terminal.
+Uma tela para ver a API funcionando de ponta a ponta, sem nenhuma alteração na API. Ela abre sozinha com o `npm run dev`, em `http://localhost:5173`. Se essa porta estiver ocupada, o comando usa a seguinte e mostra o endereço no terminal.
 
 ### Primeiro uso
 
@@ -70,8 +65,8 @@ O seletor **Vendo o feed de**, na barra lateral, troca o cliente ativo. No celul
 - **Depois de rodar o `npm run seed`, prepare o cenário de novo.** O seed apaga o banco. A tela percebe, avisa e limpa os dados locais.
 - **Recomeçar** limpa só o que está no navegador. Os dados continuam no banco.
 - **A faixa "A API não respondeu"** significa que a API não está rodando. Suba com `npm run dev`.
-- **A interface procura a API na porta 3000.** Se mudar o `PORT` no `.env`, ajuste também o `web/vite.config.ts`.
-- **Se as chamadas responderem 404 sem corpo,** o proxy do Vite pode ter ficado sem conexão com a API. Pare e rode `npm run web` de novo.
+- **Se o terminal avisar que a API não respondeu,** o banco provavelmente está desligado. Rode `docker compose up -d` e reinicie o `npm run dev`.
+- **Se as chamadas responderem 404 sem corpo,** o proxy do Vite pode ter ficado sem conexão com a API. Pare e rode `npm run dev` de novo.
 
 ## Como rodar os testes
 
@@ -196,6 +191,7 @@ src/
 drizzle/       migrations SQL versionadas
 test/          testes de integração e helpers
 web/           interface de demonstração em React
+scripts/       comando que sobe a API e a interface juntas
 docs/          imagens usadas neste README
 .github/       workflow de CI
 ```
