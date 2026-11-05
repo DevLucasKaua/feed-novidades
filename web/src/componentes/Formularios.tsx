@@ -2,14 +2,7 @@ import { Check, Plus } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import type { ErroApi, Resultado } from '../api';
 import type { Demo } from '../useDemo';
-
-const iniciais = (nome: string) =>
-  nome
-    .split(' ')
-    .slice(0, 2)
-    .map((parte) => parte[0])
-    .join('')
-    .toUpperCase();
+import { Avatar } from './comum';
 
 const erroDoCampo = (erro: ErroApi | null, campo: string) =>
   erro?.detalhes.find((d) => d.campo === campo)?.mensagem;
@@ -71,7 +64,7 @@ function Campo(props: {
   );
 }
 
-function NovoCliente({ demo }: { demo: Demo }) {
+export function NovoCliente({ demo }: { demo: Demo }) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const { enviando, erro, enviar } = useEnvio();
@@ -109,7 +102,7 @@ function NovoCliente({ demo }: { demo: Demo }) {
   );
 }
 
-function NovaLoja({ demo }: { demo: Demo }) {
+export function NovaLoja({ demo }: { demo: Demo }) {
   const [nome, setNome] = useState('');
   const { enviando, erro, enviar } = useEnvio();
 
@@ -146,6 +139,36 @@ function NovaLoja({ demo }: { demo: Demo }) {
   );
 }
 
+export function ListaLojas({ demo }: { demo: Demo }) {
+  if (!demo.lojas.length) {
+    return <p className="mensagem">Nenhuma loja ainda. Crie uma abaixo ou prepare o cenário.</p>;
+  }
+  return (
+    <ul className="lista-lojas">
+      {demo.lojas.map((loja) => {
+        const seguindo = demo.seguidas.includes(loja.id);
+        return (
+          <li key={loja.id}>
+            <Avatar nome={loja.nome} />
+            <span className="loja-nome">{loja.nome}</span>
+            <button
+              className={seguindo ? 'botao-seguir ativo' : 'botao-seguir'}
+              type="button"
+              aria-pressed={seguindo}
+              aria-label={`${seguindo ? 'Deixar de seguir' : 'Seguir'} ${loja.nome}`}
+              disabled={!demo.clienteAtivoId}
+              onClick={() => demo.alternarSeguir(loja.id)}
+            >
+              {seguindo && <Check size={14} aria-hidden="true" />}
+              {seguindo ? 'Seguindo' : 'Seguir'}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 const lerPreco = (texto: string) => {
   const limpo = texto.trim().replace(',', '.');
   if (!limpo) return undefined;
@@ -153,7 +176,7 @@ const lerPreco = (texto: string) => {
   return Number.isNaN(numero) ? texto : numero;
 };
 
-function Publicar({ demo }: { demo: Demo }) {
+export function Publicar({ demo }: { demo: Demo }) {
   const [lojaEscolhida, setLojaEscolhida] = useState<number | null>(null);
   const [texto, setTexto] = useState('');
   const [preco, setPreco] = useState('');
@@ -189,7 +212,7 @@ function Publicar({ demo }: { demo: Demo }) {
         </div>
         <textarea
           id="publicar-texto"
-          rows={2}
+          rows={3}
           value={texto}
           aria-invalid={Boolean(erroDoCampo(erro, 'texto'))}
           onChange={(e) => setTexto(e.target.value)}
@@ -234,95 +257,3 @@ function Publicar({ demo }: { demo: Demo }) {
     </form>
   );
 }
-
-export function PainelLojas({ demo }: { demo: Demo }) {
-  const semDados = !demo.lojas.length && !demo.clientes.length;
-
-  return (
-    <div className="painel-rolagem">
-      {semDados && (
-        <div className="boas-vindas">
-          <h2>Veja a API em ação</h2>
-          <p>
-            O cenário cria lojas, clientes e novidades com chamadas reais. Cada uma aparece no
-            painel de chamadas.
-          </p>
-          <button
-            className="botao botao-primario"
-            type="button"
-            disabled={demo.preparando}
-            onClick={demo.prepararCenario}
-          >
-            {demo.preparando ? 'Preparando...' : 'Preparar cenário'}
-          </button>
-        </div>
-      )}
-
-      <section className="secao">
-        <h2>Cliente</h2>
-        {demo.clientes.length > 0 && (
-          <div className="campo">
-            <label htmlFor="cliente-ativo">Vendo o feed de</label>
-            <select
-              id="cliente-ativo"
-              value={demo.clienteAtivoId ?? ''}
-              onChange={(e) => demo.selecionarCliente(Number(e.target.value))}
-            >
-              {demo.clientes.map((cliente) => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.nome}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-        {demo.clientes.length > 0 ? (
-          <details className="expansivel">
-            <summary>Criar outro cliente</summary>
-            <NovoCliente demo={demo} />
-          </details>
-        ) : (
-          <NovoCliente demo={demo} />
-        )}
-      </section>
-
-      <section className="secao">
-        <h2>Lojas</h2>
-        {demo.lojas.length > 0 && (
-          <ul className="lista-lojas">
-            {demo.lojas.map((loja) => {
-              const seguindo = demo.seguidas.includes(loja.id);
-              return (
-                <li key={loja.id}>
-                  <span className="avatar" aria-hidden="true">
-                    {iniciais(loja.nome)}
-                  </span>
-                  <span className="loja-nome">{loja.nome}</span>
-                  <button
-                    className={seguindo ? 'botao-seguir ativo' : 'botao-seguir'}
-                    type="button"
-                    aria-pressed={seguindo}
-                    aria-label={`${seguindo ? 'Deixar de seguir' : 'Seguir'} ${loja.nome}`}
-                    disabled={!demo.clienteAtivoId}
-                    onClick={() => demo.alternarSeguir(loja.id)}
-                  >
-                    {seguindo && <Check size={14} aria-hidden="true" />}
-                    {seguindo ? 'Seguindo' : 'Seguir'}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        <NovaLoja demo={demo} />
-      </section>
-
-      <section className="secao">
-        <h2>Publicar novidade</h2>
-        <Publicar demo={demo} />
-      </section>
-    </div>
-  );
-}
-
-export { iniciais };

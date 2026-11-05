@@ -96,7 +96,12 @@ async function chamar<T>(metodo: string, caminho: string, enviado?: unknown, cru
 
   if (status === 0) return { ok: false, status, erro: API_FORA_DO_AR } as Resultado<T>;
   if (status >= 400) {
-    return { ok: false, status, erro: (resposta as { erro: ErroApi }).erro } as Resultado<T>;
+    const erro = (resposta as { erro?: ErroApi } | null)?.erro ?? {
+      codigo: 'RESPOSTA_INESPERADA',
+      mensagem: `A resposta ${status} não veio no formato da API.`,
+      detalhes: [],
+    };
+    return { ok: false, status, erro } as Resultado<T>;
   }
   return { ok: true, status, corpo: resposta as T } as Resultado<T>;
 }
