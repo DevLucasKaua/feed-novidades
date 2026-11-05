@@ -14,6 +14,8 @@ import { rotasLojas } from './modulos/lojas/rotas.js';
 export function criarApp() {
   const app = Fastify({ logger: process.env.NODE_ENV !== 'test' });
 
+  // O Fastify aceita text/plain por padrão, e o corpo chegaria à validação como texto.
+  app.removeContentTypeParser('text/plain');
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
   registrarTratamentoDeErros(app);

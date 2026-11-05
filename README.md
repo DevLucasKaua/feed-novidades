@@ -48,14 +48,14 @@ Uma tela para ver a API funcionando de ponta a ponta, sem nenhuma alteração na
 
 ### Páginas
 
-| Página                | Para que serve                                                                     | Rotas usadas                                                                                    |
-| --------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| **Painel**            | Novidade mais recente, indicadores, tempo das chamadas, feed resumido e publicação | várias                                                                                          |
-| **Feed**              | Feed completo, com escolha do limite (5, 20 ou 50) e **Carregar mais**             | `GET /clientes/{id}/feed`                                                                       |
-| **Lojas**             | Criar loja, seguir, deixar de seguir e publicar                                    | `POST /lojas`, `POST` e `DELETE /clientes/{id}/seguindo/{lojaId}`, `POST /lojas/{id}/novidades` |
-| **Clientes**          | Criar cliente e escolher de quem é o feed exibido                                  | `POST /clientes`                                                                                |
-| **Chamadas**          | Cada requisição feita pela tela, com método, status, tempo e JSON                  | todas                                                                                           |
-| **Respostas de erro** | Dispara os casos 400, 404, 409 e 422 e mostra a resposta                           | várias                                                                                          |
+| Página                | Para que serve                                                                                              | Rotas usadas                                                                                    |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Painel**            | Novidade mais recente, indicadores, tempo das chamadas, feed resumido, últimas chamadas, publicação e lojas | várias                                                                                          |
+| **Feed**              | Feed completo, com escolha do limite (5, 20 ou 50) e **Carregar mais**                                      | `GET /clientes/{id}/feed`                                                                       |
+| **Lojas**             | Criar loja, seguir, deixar de seguir e publicar                                                             | `POST /lojas`, `POST` e `DELETE /clientes/{id}/seguindo/{lojaId}`, `POST /lojas/{id}/novidades` |
+| **Clientes**          | Criar cliente e escolher de quem é o feed exibido                                                           | `POST /clientes`                                                                                |
+| **Chamadas**          | Cada requisição feita pela tela, com método, status, tempo e JSON                                           | todas                                                                                           |
+| **Respostas de erro** | Dispara os casos 400, 404, 409 e 422 e mostra a resposta                                                    | várias                                                                                          |
 
 O seletor **Vendo o feed de**, na barra lateral, troca o cliente ativo. No celular, essa troca fica na página **Clientes**.
 
@@ -117,7 +117,7 @@ curl -X POST localhost:3000/lojas/5/novidades -H 'Content-Type: application/json
   -d '{"texto":"Ração em promoção","preco":79.9}'
 ```
 
-`201`: `{"id":26,"lojaId":5,"texto":"Ração em promoção","preco":"79.90","criadoEm":"2026-11-04T23:39:46.062Z"}`
+`201`: `{"id":26,"texto":"Ração em promoção","preco":"79.90","criadoEm":"2026-11-04T23:39:46.062Z","lojaId":5}`
 
 ### `GET /clientes/{id}/feed?limite=20`
 
@@ -220,7 +220,7 @@ Medições num notebook, com PostgreSQL 17 em Docker, 2 mil lojas, 150 mil clien
 
 ### Banco
 
-- **Regras no banco:** e-mail único, chave primária `(cliente_id, loja_id)`, chaves estrangeiras e `CHECK` de texto e preço. Os erros 404 e 409 de seguir e publicar vêm dessas restrições, sem `SELECT` prévio, porque duas requisições simultâneas passariam juntas por uma checagem na aplicação. Há teste com requisições em paralelo.
+- **Regras no banco:** e-mail único, chave primária `(cliente_id, loja_id)`, chaves estrangeiras e `CHECK` de tamanho do texto e do nome e de preço positivo. Os erros 404 e 409 de seguir e publicar vêm dessas restrições, sem `SELECT` prévio, porque duas requisições simultâneas passariam juntas por uma checagem na aplicação. Há teste com requisições em paralelo.
 - **`seguindo` sem índice extra:** a chave primária já começa por `cliente_id`, que é a busca do feed. Um índice por `loja_id` só faria sentido com uma funcionalidade que liste seguidores.
 - **`bigint` como id:** índice compacto e ids fáceis de usar em testes manuais. Em troca, os ids são sequenciais e revelam volume, o que seria reavaliado se a API fosse pública.
 - **`NUMERIC(12,2)` para preço:** float acumula erro de arredondamento em dinheiro.

@@ -15,8 +15,12 @@ describe('formato de erro', () => {
     esperarErro(await postCru('{ nome', 'application/json'), 400, 'REQUISICAO_INVALIDA');
   });
 
-  it('Content-Type não suportado', async () => {
-    esperarErro(await postCru('nome=Loja', 'text/xml'), 415, 'TIPO_NAO_SUPORTADO');
+  it.each([
+    ['text/xml', '<nome>Loja</nome>'],
+    ['text/plain', '{"nome":"Loja"}'],
+    ['application/x-www-form-urlencoded', 'nome=Loja'],
+  ])('Content-Type %s não suportado', async (tipo, corpo) => {
+    esperarErro(await postCru(corpo, tipo), 415, 'TIPO_NAO_SUPORTADO');
   });
 
   it('corpo acima do limite', async () => {
