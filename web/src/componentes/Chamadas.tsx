@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { api, type Chamada } from '../api';
 import type { Demo } from '../useDemo';
 import { classeDoStatus } from './comum';
@@ -107,6 +107,7 @@ const classeDaBarra = (status: number) =>
 export function GraficoChamadas({ demo }: { demo: Demo }) {
   const [emFoco, setEmFoco] = useState<Chamada | null>(null);
   const recentes = demo.chamadas.slice(0, BARRAS).reverse();
+  const presentesAoMontar = useRef(new Set(recentes.map((c) => c.id)));
   const maiorTempo = Math.max(1, ...recentes.map((c) => c.ms));
   const vazias = Array.from({ length: BARRAS - recentes.length }, (_, i) => i);
   const media = recentes.length
@@ -130,7 +131,7 @@ export function GraficoChamadas({ demo }: { demo: Demo }) {
             <span className="barra barra-vazia" />
           </span>
         ))}
-        {recentes.map((chamada) => (
+        {recentes.map((chamada, indice) => (
           <button
             className="coluna"
             type="button"
@@ -141,7 +142,12 @@ export function GraficoChamadas({ demo }: { demo: Demo }) {
           >
             <span
               className={`barra ${classeDaBarra(chamada.status)}`}
-              style={{ height: `${Math.max(6, (chamada.ms / maiorTempo) * 100)}%` }}
+              style={{
+                height: `${Math.max(6, (chamada.ms / maiorTempo) * 100)}%`,
+                animationDelay: presentesAoMontar.current.has(chamada.id)
+                  ? `${200 + indice * 25}ms`
+                  : '0ms',
+              }}
             />
           </button>
         ))}
