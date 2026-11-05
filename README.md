@@ -17,6 +17,19 @@ A API sobe em `http://localhost:3000` e aplica as migrations sozinha ao iniciar.
 
 Para ter dados de exemplo, rode `npm run seed` em outro terminal. O comando **apaga os dados do banco de desenvolvimento** e cria 5 lojas, 3 clientes e 25 novidades. O cliente 1 segue as lojas 1, 2 e 3, e o cliente 3 não segue nenhuma.
 
+## Interface de demonstração
+
+Uma tela para ver a API funcionando de ponta a ponta. Com a API no ar, em outro terminal:
+
+```bash
+npm --prefix web ci
+npm run web
+```
+
+Abra `http://localhost:5173` e clique em **Preparar cenário**. O painel à direita mostra cada chamada real à API, com método, status, tempo e JSON, e o item **Testar respostas de erro** dispara os casos 400, 404, 409 e 422.
+
+**Recomeçar** limpa só o que está no navegador. Os dados continuam no banco.
+
 ## Como rodar os testes
 
 Com o banco no ar (`docker compose up -d`):
@@ -139,6 +152,7 @@ src/
   modulos/     lojas, clientes e feed, cada um com rotas.ts e servico.ts
 drizzle/       migrations SQL versionadas
 test/          testes de integração e helpers
+web/           interface de demonstração em React
 .github/       workflow de CI
 ```
 
@@ -196,6 +210,7 @@ O horário do cursor é lido do banco como texto porque o PostgreSQL guarda micr
 - **Vitest contra PostgreSQL real:** as regras principais dependem de restrições e da ordenação do banco, que um mock não verificaria.
 - **Biome:** lint e formatação numa só ferramenta.
 - **OpenAPI gerada dos schemas Zod:** a documentação usa os mesmos schemas que validam entrada e saída, então não tem como divergir do comportamento real.
+- **Interface em `web/`, separada da API:** projeto próprio, com dependências próprias, ligado à API pelo proxy do Vite. A API não sabe que ela existe, e nenhuma linha do backend mudou para recebê-la. Como a API não tem endpoints de listagem, que o enunciado não pede, os ids criados ficam no `localStorage`, e a tela se recupera sozinha se o banco tiver sido reiniciado.
 - **GitHub Actions:** lint, tipos, build e testes a cada PR, em Node 22.12, a versão mínima, e 26.
 
 ## O que ficou de fora e o que faria com mais tempo
@@ -207,4 +222,5 @@ Limites conhecidos e próximos passos:
 - **Cliente que segue muitas lojas:** o custo cresce com esse número, como mostra a medição de 88 ms. Se isso virar um caso real, os caminhos são um limite de lojas seguidas ou um cache curto do feed.
 - **Migrations ao subir a API:** simples para este projeto. Em produção com várias instâncias, eu rodaria como etapa do deploy.
 - **Tamanho de `nome`:** o enunciado não define máximo, e o único teto hoje é o limite de 1 MB do corpo.
+- **Testes da interface:** o CI só garante que ela compila. O comportamento foi verificado manualmente no navegador.
 - **Observabilidade e proteção:** métricas, rate limit e autenticação, esta última fora do escopo do desafio.
