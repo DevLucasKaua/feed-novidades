@@ -36,6 +36,9 @@ GET {{base}}/clientes/1/feed
 ### Feed com limite informado
 GET {{base}}/clientes/1/feed?limite=5
 
+### Próxima página do feed (use o proximoCursor da resposta anterior)
+GET {{base}}/clientes/1/feed?limite=5&cursor=7
+
 ### Erro 422: limite acima do máximo
 GET {{base}}/clientes/1/feed?limite=51
 

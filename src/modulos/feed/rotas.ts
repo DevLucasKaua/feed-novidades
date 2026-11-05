@@ -6,8 +6,6 @@ export const rotasFeed: FastifyPluginAsyncZod = async (app) => {
   app.get(
     '/clientes/:id/feed',
     { schema: { params: idParams, querystring: feedQuery } },
-    async (request) => ({
-      novidades: await obterFeed(request.params.id, request.query.limite),
-    }),
+    async (request) => obterFeed(request.params.id, request.query),
   );
 };

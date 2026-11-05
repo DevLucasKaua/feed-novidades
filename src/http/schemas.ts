@@ -19,6 +19,7 @@ export const feedQuery = z.object({
   limite: inteiroPositivoDaUrl
     .refine((n) => n <= LIMITE_MAXIMO, `Deve ser no máximo ${LIMITE_MAXIMO}`)
     .default(LIMITE_PADRAO),
+  cursor: inteiroPositivoDaUrl.optional(),
 });
 
 export const textoObrigatorio = (campo: string) =>

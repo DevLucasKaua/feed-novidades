@@ -11,10 +11,14 @@ export class ErroApi extends Error {
     readonly status: number,
     readonly codigo: string,
     mensagem: string,
+    readonly detalhes: Detalhe[] = [],
   ) {
     super(mensagem);
   }
 }
+
+export const campoInvalido = (campo: string, mensagem: string) =>
+  new ErroApi(422, 'VALIDACAO', 'Dados inválidos', [{ campo, mensagem }]);
 
 export const naoEncontrado = (mensagem: string) => new ErroApi(404, 'NAO_ENCONTRADO', mensagem);
 
@@ -39,7 +43,7 @@ export function registrarTratamentoDeErros(app: FastifyInstance) {
 
   app.setErrorHandler((erro: FastifyError, request, reply) => {
     if (erro instanceof ErroApi) {
-      return reply.status(erro.status).send(corpoDeErro(erro.codigo, erro.message));
+      return reply.status(erro.status).send(corpoDeErro(erro.codigo, erro.message, erro.detalhes));
     }
 
     if (hasZodFastifySchemaValidationErrors(erro)) {
