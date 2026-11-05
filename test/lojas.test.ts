@@ -18,7 +18,12 @@ describe('POST /lojas', () => {
     ['vazio', { nome: '' }],
     ['só com espaços', { nome: '   ' }],
     ['de outro tipo', { nome: 123 }],
+    ['com 101 caracteres', { nome: 'a'.repeat(101) }],
   ])('rejeita nome %s', async (_, corpo) => {
     esperarErro(await post('/lojas', corpo), 422, 'VALIDACAO');
+  });
+
+  it('aceita nome com 100 emojis', async () => {
+    expect((await post('/lojas', { nome: '🛍'.repeat(100) })).statusCode).toBe(201);
   });
 });

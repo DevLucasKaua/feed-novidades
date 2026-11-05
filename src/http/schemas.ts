@@ -22,8 +22,19 @@ export const feedQuery = z.object({
   cursor: inteiroPositivoDaUrl.optional(),
 });
 
-export const textoObrigatorio = (campo: string) =>
-  z.string(`${campo} é obrigatório`).trim().min(1, `${campo} é obrigatório`);
+// String.length conta unidades UTF-16 e um emoji valeria 2. O spread conta caracteres
+// reais, igual ao char_length dos CHECKs no banco.
+export const textoObrigatorio = (campo: string, maximo: number) =>
+  z
+    .string(`${campo} é obrigatório`)
+    .trim()
+    .min(1, `${campo} é obrigatório`)
+    .refine(
+      (texto) => [...texto].length <= maximo,
+      `${campo} deve ter no máximo ${maximo} caracteres`,
+    );
+
+export const NOME_MAXIMO = 100;
 
 export const dataHora = z.codec(z.iso.datetime(), z.date(), {
   decode: (texto) => new Date(texto),

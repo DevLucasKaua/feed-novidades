@@ -4,6 +4,7 @@ import {
   dataHora,
   errosPossiveis,
   idParams,
+  NOME_MAXIMO,
   novidadeBase,
   textoObrigatorio,
 } from '../../http/schemas.js';
@@ -13,12 +14,7 @@ const TEXTO_MAXIMO = 500;
 const PRECO_MAXIMO = 9_999_999_999.99;
 
 const novaNovidade = z.object({
-  // String.length conta unidades UTF-16 e um emoji valeria 2. O spread conta caracteres
-  // reais, igual ao char_length do CHECK no banco.
-  texto: textoObrigatorio('texto').refine(
-    (texto) => [...texto].length <= TEXTO_MAXIMO,
-    `texto deve ter no máximo ${TEXTO_MAXIMO} caracteres`,
-  ),
+  texto: textoObrigatorio('texto', TEXTO_MAXIMO),
   preco: z
     .number('preco deve ser um número')
     .positive('preco deve ser maior que zero')
@@ -40,7 +36,7 @@ export const rotasLojas: FastifyPluginAsyncZod = async (app) => {
       schema: {
         tags: ['Lojas'],
         summary: 'Cria uma loja',
-        body: z.object({ nome: textoObrigatorio('nome') }),
+        body: z.object({ nome: textoObrigatorio('nome', NOME_MAXIMO) }),
         response: { 201: loja, ...errosPossiveis(400, 422) },
       },
     },

@@ -1,0 +1,2 @@
+ALTER TABLE "clientes" ADD CONSTRAINT "clientes_nome_tamanho" CHECK (char_length("clientes"."nome") between 1 and 100);--> statement-breakpoint
+ALTER TABLE "lojas" ADD CONSTRAINT "lojas_nome_tamanho" CHECK (char_length("lojas"."nome") between 1 and 100);
