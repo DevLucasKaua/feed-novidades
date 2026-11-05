@@ -62,22 +62,14 @@ function Destaque({ demo, ir }: PropsPagina) {
         </div>
         <div>
           <h2>{recente?.texto ?? 'O feed ainda está vazio'}</h2>
-          <dl className="destaque-dados">
-            {recente?.preco && (
+          {recente?.preco && (
+            <dl className="destaque-dados">
               <div>
                 <dt>Preço</dt>
                 <dd>{formatarPreco(recente.preco)}</dd>
               </div>
-            )}
-            <div>
-              <dt>Nesta página</dt>
-              <dd>{demo.novidades.length}</dd>
-            </div>
-            <div>
-              <dt>Lojas seguidas</dt>
-              <dd>{demo.seguidas.length}</dd>
-            </div>
-          </dl>
+            </dl>
+          )}
         </div>
       </div>
       <div className="destaque-acoes">
@@ -93,19 +85,33 @@ function Destaque({ demo, ir }: PropsPagina) {
   );
 }
 
-function Indicador(props: { rotulo: string; valor: string | number; alerta?: boolean }) {
+function Resumo({ demo }: { demo: Demo }) {
+  const erros = demo.chamadas.filter((c) => c.status >= 400 || c.status === 0).length;
+  const itens = [
+    { rotulo: 'Lojas seguidas', valor: demo.seguidas.length },
+    {
+      rotulo: 'Novidades no feed',
+      valor: `${demo.novidades.length}${demo.proximoCursor ? '+' : ''}`,
+    },
+    { rotulo: 'Chamadas feitas', valor: demo.chamadas.length },
+    { rotulo: 'Respostas de erro', valor: erros, alerta: erros > 0 },
+  ];
+
   return (
-    <section className={props.alerta ? 'cartao indicador indicador-alerta' : 'cartao indicador'}>
-      <h2>{props.rotulo}</h2>
-      <p>{props.valor}</p>
+    <section className="cartao resumo" aria-label="Resumo">
+      <dl>
+        {itens.map((item) => (
+          <div key={item.rotulo} className={item.alerta ? 'resumo-alerta' : undefined}>
+            <dt>{item.rotulo}</dt>
+            <dd>{item.valor}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }
 
 export function PaginaPainel({ demo, ir }: PropsPagina) {
-  const erros = demo.chamadas.filter((c) => c.status >= 400 || c.status === 0).length;
-  const quantidadeNoFeed = `${demo.novidades.length}${demo.proximoCursor ? '+' : ''}`;
-
   return (
     <>
       <Cabecalho
@@ -128,7 +134,7 @@ export function PaginaPainel({ demo, ir }: PropsPagina) {
       <div className="blocos">
         <Destaque demo={demo} ir={ir} />
         <Cartao
-          className="bloco-4"
+          className="bloco-4 bloco-grafico"
           titulo="Tempo das chamadas"
           subtitulo={
             demo.chamadas.length === 1
@@ -139,45 +145,40 @@ export function PaginaPainel({ demo, ir }: PropsPagina) {
           <GraficoChamadas demo={demo} />
         </Cartao>
 
-        <Indicador rotulo="Lojas seguidas" valor={demo.seguidas.length} />
-        <Indicador rotulo="Novidades no feed" valor={quantidadeNoFeed} />
-        <Indicador rotulo="Chamadas feitas" valor={demo.chamadas.length} />
-        <Indicador rotulo="Respostas de erro" valor={erros} alerta={erros > 0} />
+        <Resumo demo={demo} />
 
-        <Cartao
-          className="bloco-7"
-          titulo="Feed"
-          subtitulo={demo.clienteAtivo?.nome ?? 'Nenhum cliente'}
-          acao={
-            <button className="botao-texto" type="button" onClick={() => ir('feed')}>
-              Ver tudo
-            </button>
-          }
-        >
-          <ListaFeed demo={demo} maximo={4} />
-        </Cartao>
-        <Cartao
-          className="bloco-5"
-          titulo="Publicar novidade"
-          subtitulo="POST /lojas/{id}/novidades"
-        >
-          <Publicar demo={demo} />
-        </Cartao>
+        <div className="pilha bloco-7">
+          <Cartao
+            titulo="Feed"
+            subtitulo={demo.clienteAtivo?.nome ?? 'Nenhum cliente'}
+            acao={
+              <button className="botao-texto" type="button" onClick={() => ir('feed')}>
+                Ver tudo
+              </button>
+            }
+          >
+            <ListaFeed demo={demo} maximo={4} />
+          </Cartao>
+          <Cartao
+            titulo="Últimas chamadas"
+            acao={
+              <button className="botao-texto" type="button" onClick={() => ir('chamadas')}>
+                Ver todas
+              </button>
+            }
+          >
+            <ListaChamadas demo={demo} maximo={6} />
+          </Cartao>
+        </div>
 
-        <Cartao className="bloco-5" titulo="Lojas" subtitulo="Seguir muda o feed na hora">
-          <ListaLojas demo={demo} />
-        </Cartao>
-        <Cartao
-          className="bloco-7"
-          titulo="Últimas chamadas"
-          acao={
-            <button className="botao-texto" type="button" onClick={() => ir('chamadas')}>
-              Ver todas
-            </button>
-          }
-        >
-          <ListaChamadas demo={demo} maximo={6} />
-        </Cartao>
+        <div className="pilha bloco-5">
+          <Cartao titulo="Publicar novidade" subtitulo="POST /lojas/{id}/novidades">
+            <Publicar demo={demo} />
+          </Cartao>
+          <Cartao titulo="Lojas" subtitulo="Seguir muda o feed na hora">
+            <ListaLojas demo={demo} />
+          </Cartao>
+        </div>
       </div>
     </>
   );

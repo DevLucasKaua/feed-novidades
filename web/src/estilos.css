@@ -490,8 +490,25 @@ small {
   grid-column: span 8;
 }
 
-.indicador {
-  grid-column: span 3;
+.resumo {
+  grid-column: span 12;
+}
+
+.pilha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  align-self: stretch;
+  min-width: 0;
+}
+
+/* O último card estica para as duas colunas terminarem na mesma linha. */
+.pilha > .cartao {
+  align-content: start;
+}
+
+.pilha > :last-child {
+  flex: 1;
 }
 
 .cartao {
@@ -609,46 +626,41 @@ small {
   padding: 1rem 1.5rem;
 }
 
-.cartao.indicador {
-  position: relative;
-  gap: 0.5rem;
-  min-height: 8rem;
-  align-content: start;
+.cartao.resumo {
+  padding: 0;
 }
 
-.indicador::after {
-  content: "";
-  position: absolute;
-  right: 1.25rem;
-  bottom: 1.125rem;
-  width: 45%;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--destaque);
-  opacity: 0.55;
+.resumo dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.indicador h2 {
+.resumo dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.resumo dl > div + div {
+  border-left: 1px solid var(--linha);
+}
+
+.resumo dt {
   font-size: 0.875rem;
-  font-weight: 400;
   color: var(--suave);
 }
 
-.indicador p {
-  font-size: 2rem;
+.resumo dd {
+  font-size: 1.75rem;
   font-weight: 500;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
 
-.cartao.indicador-alerta {
-  background:
-    radial-gradient(90% 120% at 0% 0%, oklch(0.86 0.15 85 / 0.09), transparent 70%),
-    var(--superficie);
-}
-
-.indicador-alerta::after {
-  background: var(--alerta);
+.resumo-alerta dd {
+  color: var(--alerta);
 }
 
 .botao {
@@ -1386,7 +1398,15 @@ textarea:hover {
     grid-column: span 12;
   }
 
-  .indicador {
+  .blocos > .destaque {
+    grid-column: span 7;
+  }
+
+  .blocos > .bloco-grafico {
+    grid-column: span 5;
+  }
+
+  .blocos > .pilha {
     grid-column: span 6;
   }
 }
@@ -1472,6 +1492,18 @@ textarea:hover {
   }
 }
 
+@media (max-width: 48rem) {
+  .blocos > .destaque,
+  .blocos > .bloco-grafico,
+  .blocos > .pilha {
+    grid-column: span 12;
+  }
+
+  .pilha > :last-child {
+    flex: none;
+  }
+}
+
 @media (max-width: 40rem) {
   .superior-marca .marca > span:last-child,
   .situacao,
@@ -1503,11 +1535,26 @@ textarea:hover {
     padding: 0.875rem 1.125rem;
   }
 
-  .cartao.indicador {
-    min-height: 6.75rem;
+  .resumo dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .cartao:not(.destaque) {
+  .resumo dl > div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .resumo dl > div:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .resumo dl > div:nth-child(n + 3) {
+    border-top: 1px solid var(--linha);
+  }
+
+  .cartao:not(.destaque, .resumo) {
     padding: 1rem;
   }
 
