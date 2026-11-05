@@ -1,18 +1,18 @@
 import { and, eq } from 'drizzle-orm';
-import { db } from '../../db/client.js';
+import { db, linhaInserida } from '../../db/client.js';
 import { comRestricoes } from '../../db/restricoes.js';
 import { clientes, seguindo } from '../../db/schema.js';
 import { conflito, naoEncontrado } from '../../http/errors.js';
 
 export async function criarCliente(dados: { nome: string; email: string }) {
-  const [cliente] = await comRestricoes(db.insert(clientes).values(dados).returning(), {
+  const linhas = await comRestricoes(db.insert(clientes).values(dados).returning(), {
     clientes_email_unico: conflito('E-mail já cadastrado'),
   });
-  return cliente;
+  return linhaInserida(linhas);
 }
 
 export async function seguirLoja(clienteId: number, lojaId: number) {
-  const [seguimento] = await comRestricoes(
+  const linhas = await comRestricoes(
     db.insert(seguindo).values({ clienteId, lojaId }).returning(),
     {
       seguindo_pk: conflito('Cliente já segue esta loja'),
@@ -20,7 +20,7 @@ export async function seguirLoja(clienteId: number, lojaId: number) {
       seguindo_loja_id_lojas_id_fk: naoEncontrado('Loja não encontrada'),
     },
   );
-  return seguimento;
+  return linhaInserida(linhas);
 }
 
 export async function deixarDeSeguirLoja(clienteId: number, lojaId: number) {
