@@ -84,8 +84,15 @@ curl 'localhost:3000/clientes/3/feed?limite=1'
       "preco": "79.90",
       "criadoEm": "2026-11-04T23:39:46.062Z"
     }
-  ]
+  ],
+  "proximoCursor": 26
 }
+```
+
+Para a próxima página, envie o valor recebido em `cursor`. Quando `proximoCursor` vier `null`, não há mais novidades.
+
+```bash
+curl 'localhost:3000/clientes/3/feed?limite=1&cursor=26'
 ```
 
 ### `DELETE /clientes/{id}/seguindo/{lojaId}`
@@ -171,8 +178,13 @@ Pontos que o enunciado deixa abertos:
 - **`texto` conta caracteres reais:** `String.length` contaria um emoji como 2, e 500 emojis seriam rejeitados, enquanto o `char_length` do banco os aceita.
 - **`texto` e `nome` são gravados sem espaços nas pontas**, e só espaços conta como vazio.
 - **`email` é gravado em minúsculas**, para `A@x.com` e `a@x.com` serem o mesmo cliente.
-- **O feed responde `{ "novidades": [...] }`**, e não uma lista pura, para aceitar paginação depois sem quebrar quem já consome.
 - **Empate de horário é resolvido pelo `id`**, para a ordem ser estável entre chamadas.
+
+### Paginação por cursor
+
+O `cursor` é o id da última novidade recebida, e a consulta continua a partir de `(criado_em, id)` dela. Com `OFFSET`, o banco leria e descartaria tudo o que foi pulado, e cada novidade publicada durante a navegação deslocaria as páginas, repetindo itens. Com cursor, o custo não depende da profundidade: medi 3,0 ms na primeira página e 3,3 ms perto do fim de 3 milhões de novidades.
+
+O horário do cursor é lido do banco como texto porque o PostgreSQL guarda microssegundos e o `Date` do JavaScript só guarda milissegundos, o que pularia novidades do mesmo milissegundo. Há teste para esse caso. O `proximoCursor` vem de buscar um item além do limite, o que dispensa contagem.
 
 ### Organização e bibliotecas
 
@@ -185,7 +197,7 @@ Pontos que o enunciado deixa abertos:
 
 ## O que ficou de fora e o que faria com mais tempo
 
-Os diferenciais pendentes estão nas [issues](https://github.com/DevLucasKaua/feed-novidades/issues?q=label%3Adiferencial): paginação por cursor e OpenAPI.
+O diferencial pendente está nas [issues](https://github.com/DevLucasKaua/feed-novidades/issues?q=label%3Adiferencial): OpenAPI.
 
 Limites conhecidos e próximos passos:
 
