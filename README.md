@@ -25,6 +25,8 @@ npm ci
 npm run dev
 ```
 
+O banco só aceita conexões da própria máquina, para não ficar exposto na rede com a senha de desenvolvimento.
+
 O `npm run dev` sobe a API e a interface, instala o que faltar na interface, abre o navegador e mostra os endereços no terminal. As migrations são aplicadas sozinhas ao iniciar. `Ctrl+C` encerra tudo.
 
 Para subir só a API, use `npm run dev:api`. A especificação OpenAPI fica em `/documentation/json`.
@@ -230,7 +232,8 @@ Pontos que o enunciado deixa abertos:
 - **`limite` fora da faixa retorna 422**, em vez de reduzir para 50. Assim quem chama nunca recebe menos do que pediu sem saber.
 - **`preco` entra como número e sai como string** (`"19.90"`), para não passar por float em quem consome. Mais de 2 casas decimais é rejeitado, em vez de arredondado.
 - **Novidades anteriores ao seguir aparecem no feed**, porque o enunciado fala em tudo o que as lojas publicaram.
-- **`texto` conta caracteres reais:** `String.length` contaria um emoji como 2, e 500 emojis seriam rejeitados, enquanto o `char_length` do banco os aceita.
+- **`texto` e `nome` contam caracteres reais:** `String.length` contaria um emoji como 2, e 500 emojis seriam rejeitados, enquanto o `char_length` do banco os aceita.
+- **`nome` vai até 100 caracteres**, em loja e cliente. O enunciado não define máximo, mas sem ele o único teto seria o limite de 1 MB do corpo.
 - **`texto` e `nome` são gravados sem espaços nas pontas**, e só espaços conta como vazio.
 - **`email` é gravado em minúsculas**, para `A@x.com` e `a@x.com` serem o mesmo cliente.
 - **Empate de horário é resolvido pelo `id`**, para a ordem ser estável entre chamadas.
@@ -261,6 +264,5 @@ Limites conhecidos e próximos passos:
 
 - **Cliente que segue muitas lojas:** o custo cresce com esse número, como mostra a medição de 88 ms. Se isso virar um caso real, os caminhos são um limite de lojas seguidas ou um cache curto do feed.
 - **Migrations ao subir a API:** simples para este projeto. Em produção com várias instâncias, eu rodaria como etapa do deploy.
-- **Tamanho de `nome`:** o enunciado não define máximo, e o único teto hoje é o limite de 1 MB do corpo.
 - **Testes da interface:** o CI só garante que ela compila. O comportamento foi verificado manualmente no navegador.
 - **Observabilidade e proteção:** métricas, rate limit e autenticação, esta última fora do escopo do desafio.
