@@ -17,6 +17,18 @@ export async function criarCliente(nome = 'Cliente'): Promise<number> {
     .id;
 }
 
+export const seguir = (clienteId: number, lojaId: number) =>
+  post(`/clientes/${clienteId}/seguindo/${lojaId}`);
+
+export const obterFeed = (clienteId: number | string, query = '') =>
+  app.inject({ method: 'GET', url: `/clientes/${clienteId}/feed${query}` });
+
+export async function clienteSeguindoLoja() {
+  const [clienteId, lojaId] = [await criarCliente(), await criarLoja()];
+  await seguir(clienteId, lojaId);
+  return { clienteId, lojaId, url: `/clientes/${clienteId}/seguindo/${lojaId}` };
+}
+
 export function esperarErro(
   resposta: { statusCode: number; json: () => unknown },
   status: number,

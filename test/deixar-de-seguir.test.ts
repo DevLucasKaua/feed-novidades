@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { app, criarCliente, criarLoja, esperarErro, post } from './helpers.js';
+import {
+  app,
+  clienteSeguindoLoja,
+  criarCliente,
+  criarLoja,
+  esperarErro,
+  obterFeed,
+  post,
+  seguir,
+} from './helpers.js';
 
 const deixarDeSeguir = (url: string) => app.inject({ method: 'DELETE', url });
-
-async function clienteSeguindoLoja() {
-  const [clienteId, lojaId] = [await criarCliente(), await criarLoja()];
-  const url = `/clientes/${clienteId}/seguindo/${lojaId}`;
-  await post(url);
-  return { clienteId, lojaId, url };
-}
 
 describe('DELETE /clientes/{id}/seguindo/{lojaId}', () => {
   it('retorna 204 sem corpo', async () => {
@@ -26,20 +28,18 @@ describe('DELETE /clientes/{id}/seguindo/{lojaId}', () => {
 
     await deixarDeSeguir(url);
 
-    const feed = await app.inject({ method: 'GET', url: `/clientes/${clienteId}/feed` });
-    expect(feed.json()).toEqual({ novidades: [] });
+    expect((await obterFeed(clienteId)).json().novidades).toEqual([]);
   });
 
   it('não afeta outro cliente que segue a mesma loja', async () => {
     const { lojaId, url } = await clienteSeguindoLoja();
     const outroCliente = await criarCliente();
-    await post(`/clientes/${outroCliente}/seguindo/${lojaId}`);
+    await seguir(outroCliente, lojaId);
     await post(`/lojas/${lojaId}/novidades`, { texto: 'Oferta' });
 
     await deixarDeSeguir(url);
 
-    const feed = await app.inject({ method: 'GET', url: `/clientes/${outroCliente}/feed` });
-    expect(feed.json().novidades).toHaveLength(1);
+    expect((await obterFeed(outroCliente)).json().novidades).toHaveLength(1);
   });
 
   it('permite seguir de novo depois', async () => {

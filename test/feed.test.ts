@@ -1,27 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import { db } from '../src/db/client.js';
 import { novidades } from '../src/db/schema.js';
-import { app, criarCliente, criarLoja, esperarErro, post } from './helpers.js';
-
-const obterFeed = (clienteId: number | string, query = '') =>
-  app.inject({ method: 'GET', url: `/clientes/${clienteId}/feed${query}` });
+import {
+  clienteSeguindoLoja,
+  criarCliente,
+  criarLoja,
+  esperarErro,
+  obterFeed,
+  post,
+  seguir,
+} from './helpers.js';
 
 const textos = async (clienteId: number, query?: string) =>
   (await obterFeed(clienteId, query))
     .json()
     .novidades.map((novidade: { texto: string }) => novidade.texto);
 
-const seguir = (clienteId: number, lojaId: number) =>
-  post(`/clientes/${clienteId}/seguindo/${lojaId}`);
-
 const publicarEm = (lojaId: number, texto: string, criadoEm: string) =>
   db.insert(novidades).values({ lojaId, texto, criadoEm: new Date(criadoEm) });
-
-async function clienteSeguindoLoja() {
-  const [clienteId, lojaId] = [await criarCliente(), await criarLoja()];
-  await seguir(clienteId, lojaId);
-  return { clienteId, lojaId };
-}
 
 async function publicarVarias(lojaId: number, quantidade: number) {
   await db
@@ -49,6 +45,7 @@ describe('GET /clientes/{id}/feed', () => {
           criadoEm: expect.any(String),
         },
       ],
+      proximoCursor: null,
     });
   });
 
@@ -136,7 +133,7 @@ describe('GET /clientes/{id}/feed', () => {
     const resposta = await obterFeed(await criarCliente());
 
     expect(resposta.statusCode).toBe(200);
-    expect(resposta.json()).toEqual({ novidades: [] });
+    expect(resposta.json()).toEqual({ novidades: [], proximoCursor: null });
   });
 
   it('retorna 404 para cliente inexistente', async () => {

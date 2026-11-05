@@ -1,19 +1,38 @@
-import { type AnyColumn, desc, eq } from 'drizzle-orm';
+import { type AnyColumn, and, desc, eq, sql } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { clientes, lojas, novidades, seguindo } from '../../db/schema.js';
-import { naoEncontrado } from '../../http/errors.js';
+import { campoInvalido, naoEncontrado } from '../../http/errors.js';
 
 const maisRecentesPrimeiro = (t: { criadoEm: AnyColumn; id: AnyColumn }) => [
   desc(t.criadoEm),
   desc(t.id),
 ];
 
-export async function obterFeed(clienteId: number, limite: number) {
+async function anterioresAoCursor(cursor: number) {
+  // Lido como texto porque o Postgres guarda microssegundos e um Date só guarda milissegundos:
+  // com o valor truncado, novidades do mesmo milissegundo seriam repetidas ou puladas.
+  const [referencia] = await db
+    .select({ criadoEm: sql<string>`${novidades.criadoEm}::text` })
+    .from(novidades)
+    .where(eq(novidades.id, cursor));
+  if (!referencia) throw campoInvalido('cursor', 'Cursor não corresponde a uma novidade');
+
+  return sql`(${novidades.criadoEm}, ${novidades.id}) < (${referencia.criadoEm}::timestamptz, ${cursor}::bigint)`;
+}
+
+export async function obterFeed(
+  clienteId: number,
+  { limite, cursor }: { limite: number; cursor?: number },
+) {
   const [cliente] = await db
     .select({ id: clientes.id })
     .from(clientes)
     .where(eq(clientes.id, clienteId));
   if (!cliente) throw naoEncontrado('Cliente não encontrado');
+
+  const filtroCursor = cursor ? await anterioresAoCursor(cursor) : undefined;
+  // Um item além do limite indica se existe próxima página, sem uma consulta de contagem.
+  const quantidade = limite + 1;
 
   // O LATERAL lê só as mais recentes de cada loja pelo índice composto, então o custo depende
   // de quantas lojas o cliente segue, não do histórico nem dos seguidores da loja. A loja entra
@@ -21,9 +40,9 @@ export async function obterFeed(clienteId: number, limite: number) {
   const recentes = db
     .select()
     .from(novidades)
-    .where(eq(novidades.lojaId, seguindo.lojaId))
+    .where(and(eq(novidades.lojaId, seguindo.lojaId), filtroCursor))
     .orderBy(...maisRecentesPrimeiro(novidades))
-    .limit(limite)
+    .limit(quantidade)
     .as('recentes');
 
   const feed = db.$with('feed').as(
@@ -39,10 +58,10 @@ export async function obterFeed(clienteId: number, limite: number) {
       .crossJoinLateral(recentes)
       .where(eq(seguindo.clienteId, clienteId))
       .orderBy(...maisRecentesPrimeiro(recentes))
-      .limit(limite),
+      .limit(quantidade),
   );
 
-  return db
+  const linhas = await db
     .with(feed)
     .select({
       id: feed.id,
@@ -54,4 +73,10 @@ export async function obterFeed(clienteId: number, limite: number) {
     .from(feed)
     .innerJoin(lojas, eq(lojas.id, feed.lojaId))
     .orderBy(...maisRecentesPrimeiro(feed));
+
+  const pagina = linhas.slice(0, limite);
+  return {
+    novidades: pagina,
+    proximoCursor: linhas.length > limite ? (pagina.at(-1)?.id ?? null) : null,
+  };
 }
