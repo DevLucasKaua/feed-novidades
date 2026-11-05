@@ -2,6 +2,16 @@
 
 API REST em que clientes seguem lojas e acompanham, num feed, as novidades que essas lojas publicam.
 
+O projeto tem a API, que é a entrega principal, e uma interface opcional para ver tudo funcionando.
+
+| O que                          | Endereço                              | Como subir     |
+| ------------------------------ | ------------------------------------- | -------------- |
+| API                            | `http://localhost:3000`               | `npm run dev`  |
+| Documentação interativa da API | `http://localhost:3000/documentation` | sobe com a API |
+| Interface de demonstração      | `http://localhost:5173`               | `npm run web`  |
+
+![Painel da interface de demonstração](docs/interface-painel.png)
+
 ## Como rodar
 
 Pré-requisitos: Node.js 22.12 ou superior e Docker com Compose.
@@ -19,16 +29,49 @@ Para ter dados de exemplo, rode `npm run seed` em outro terminal. O comando **ap
 
 ## Interface de demonstração
 
-Uma tela para ver a API funcionando de ponta a ponta. Com a API no ar, em outro terminal:
+Uma tela para ver a API funcionando de ponta a ponta. Ela é opcional e não altera a API.
+
+Deixe a API rodando, conforme a seção anterior, e em **outro terminal**:
 
 ```bash
 npm --prefix web ci
 npm run web
 ```
 
-Abra `http://localhost:5173` e clique em **Preparar cenário**. O **Painel** resume o feed do cliente ativo e o tempo das chamadas. As demais páginas cobrem feed, lojas e clientes. **Chamadas** mostra cada requisição real, com método, status, tempo e JSON, e **Respostas de erro** dispara os casos 400, 404, 409 e 422.
+Depois abra `http://localhost:5173`.
 
-**Recomeçar** limpa só o que está no navegador. Os dados continuam no banco.
+### Primeiro uso
+
+1. Clique em **Preparar cenário**. A tela cria 4 lojas, 2 clientes e 7 novidades, tudo por chamadas reais à API, e passa a mostrar o feed de Ana Souza, que segue 3 das lojas.
+2. No **Painel**, publique uma novidade em uma loja seguida. Ela aparece no topo do feed.
+3. Escolha **Pet Feliz**, a loja que Ana não segue, e publique de novo. A tela avisa que o feed não muda.
+4. Em **Feed**, clique em **Seguir** nessa loja. As novidades dela entram no feed na hora. Clique de novo para deixar de seguir.
+5. Em **Respostas de erro**, dispare um caso e veja o corpo devolvido pela API.
+6. Em **Chamadas**, confira tudo o que foi feito.
+
+### Páginas
+
+| Página                | Para que serve                                                                     | Rotas usadas                                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Painel**            | Novidade mais recente, indicadores, tempo das chamadas, feed resumido e publicação | várias                                                                                          |
+| **Feed**              | Feed completo, com escolha do limite (5, 20 ou 50) e **Carregar mais**             | `GET /clientes/{id}/feed`                                                                       |
+| **Lojas**             | Criar loja, seguir, deixar de seguir e publicar                                    | `POST /lojas`, `POST` e `DELETE /clientes/{id}/seguindo/{lojaId}`, `POST /lojas/{id}/novidades` |
+| **Clientes**          | Criar cliente e escolher de quem é o feed exibido                                  | `POST /clientes`                                                                                |
+| **Chamadas**          | Cada requisição feita pela tela, com método, status, tempo e JSON                  | todas                                                                                           |
+| **Respostas de erro** | Dispara os casos 400, 404, 409 e 422 e mostra a resposta                           | várias                                                                                          |
+
+O seletor **Vendo o feed de**, na barra lateral, troca o cliente ativo. No celular, essa troca fica na página **Clientes**.
+
+![Página de chamadas da interface](docs/interface-chamadas.png)
+
+### O que saber antes de usar
+
+- **Os dados do `npm run seed` não aparecem na tela.** A API não tem endpoints de listagem, então a interface só conhece o que ela mesma criou, e guarda esses ids no navegador. Use **Preparar cenário**.
+- **Depois de rodar o `npm run seed`, prepare o cenário de novo.** O seed apaga o banco. A tela percebe, avisa e limpa os dados locais.
+- **Recomeçar** limpa só o que está no navegador. Os dados continuam no banco.
+- **A faixa "A API não respondeu"** significa que a API não está rodando. Suba com `npm run dev`.
+- **A interface procura a API na porta 3000.** Se mudar o `PORT` no `.env`, ajuste também o `web/vite.config.ts`.
+- **Se as chamadas responderem 404 sem corpo,** o proxy do Vite pode ter ficado sem conexão com a API. Pare e rode `npm run web` de novo.
 
 ## Como rodar os testes
 
@@ -92,10 +135,10 @@ curl 'localhost:3000/clientes/3/feed?limite=1'
   "novidades": [
     {
       "id": 26,
-      "loja": { "id": 5, "nome": "Pet Feliz" },
       "texto": "Ração em promoção",
       "preco": "79.90",
-      "criadoEm": "2026-11-04T23:39:46.062Z"
+      "criadoEm": "2026-11-04T23:39:46.062Z",
+      "loja": { "id": 5, "nome": "Pet Feliz" }
     }
   ],
   "proximoCursor": 26
@@ -153,6 +196,7 @@ src/
 drizzle/       migrations SQL versionadas
 test/          testes de integração e helpers
 web/           interface de demonstração em React
+docs/          imagens usadas neste README
 .github/       workflow de CI
 ```
 
