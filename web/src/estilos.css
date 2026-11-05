@@ -157,6 +157,7 @@ small {
 }
 
 .lateral nav {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -197,8 +198,22 @@ small {
 .lateral nav a.ativo:hover {
   font-weight: 500;
   color: var(--sobre-destaque);
+  background: transparent;
+}
+
+.lateral nav a,
+.navegacao-movel a {
+  position: relative;
+}
+
+.indicador-navegacao {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 1rem;
   background: var(--gradiente-ativo);
   box-shadow: var(--brilho);
+  transition: transform 340ms var(--saida);
 }
 
 .lateral-rodape {
@@ -309,9 +324,19 @@ small {
 }
 
 .situacao .ponto {
+  position: relative;
   border-radius: 50%;
   background: var(--destaque);
   box-shadow: 0 0 10px oklch(0.87 0.27 142 / 0.7);
+}
+
+.situacao:not(.situacao-falha) .ponto::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--destaque);
+  animation: pulso-status 1s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
 .situacao-falha {
@@ -350,6 +375,70 @@ small {
   font-family: var(--mono);
   font-size: 0.8125rem;
   color: var(--destaque-claro);
+}
+
+.palavra {
+  display: inline-block;
+  overflow: hidden;
+  padding-block: 0.08em 0.16em;
+  margin-block: -0.08em -0.16em;
+  vertical-align: bottom;
+}
+
+.letra {
+  display: inline-block;
+  animation: letra-entrada 600ms var(--saida) backwards;
+}
+
+.cabecalho > div:first-child > .rota,
+.cabecalho > div:first-child > p,
+.cabecalho-acoes,
+.blocos > * {
+  animation: bloco-entrada 700ms var(--saida) backwards;
+}
+
+.cabecalho > div:first-child > p {
+  animation-delay: 150ms;
+}
+
+.cabecalho-acoes {
+  animation-delay: 200ms;
+}
+
+.blocos > :nth-child(1) {
+  animation-delay: 100ms;
+}
+
+.blocos > :nth-child(2) {
+  animation-delay: 180ms;
+}
+
+.blocos > :nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.blocos > :nth-child(4) {
+  animation-delay: 280ms;
+}
+
+.blocos > :nth-child(5) {
+  animation-delay: 320ms;
+}
+
+.blocos > :nth-child(6) {
+  animation-delay: 360ms;
+}
+
+.blocos > :nth-child(7) {
+  animation-delay: 400ms;
+}
+
+.blocos > :nth-child(8) {
+  animation-delay: 440ms;
+}
+
+.blocos > :nth-child(n + 9) {
+  animation-delay: 480ms;
 }
 
 .cabecalho h1 {
@@ -577,13 +666,15 @@ small {
   white-space: nowrap;
   transition:
     border-color 150ms var(--saida),
-    box-shadow 200ms var(--saida),
-    transform 150ms var(--saida);
+    background-color 300ms ease,
+    box-shadow 300ms ease,
+    transform 300ms var(--saida);
 }
 
 .botao:hover:enabled,
 a.botao:hover {
   border-color: oklch(1 0 0 / 0.42);
+  background-color: oklch(0.29 0.004 155);
 }
 
 .botao:active:enabled {
@@ -608,6 +699,7 @@ a.botao:hover {
 }
 
 .botao-primario:hover:enabled {
+  transform: translateY(-1px);
   box-shadow:
     inset 0 1px 0 oklch(1 0 0 / 0.35),
     0 10px 34px -4px oklch(0.87 0.27 142 / 0.7);
@@ -1009,6 +1101,11 @@ textarea:hover {
   border-radius: 4px 4px 0 0;
 }
 
+.barra:not(.barra-vazia) {
+  transform-origin: bottom;
+  animation: barra-entrada 800ms var(--saida) backwards;
+}
+
 .barra-vazia {
   height: 4px;
   background: var(--linha);
@@ -1237,6 +1334,35 @@ textarea:hover {
   display: none;
 }
 
+@keyframes bloco-entrada {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(16px) scale(0.985);
+  }
+}
+
+@keyframes letra-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+}
+
+@keyframes barra-entrada {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes pulso-status {
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
 @keyframes entrada {
   from {
     opacity: 0;
@@ -1331,7 +1457,10 @@ textarea:hover {
 
   .navegacao-movel a.ativo {
     color: var(--sobre-destaque);
-    background: var(--gradiente-ativo);
+  }
+
+  .navegacao-movel .indicador-navegacao {
+    border-radius: 0.875rem;
   }
 
   .cabecalho h1 {
@@ -1392,6 +1521,7 @@ textarea:hover {
   *::before,
   *::after {
     animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
   }
