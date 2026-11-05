@@ -1,6 +1,6 @@
 {
   "files": {
-    "includes": ["**", "!dist", "!drizzle/meta"]
+    "includes": ["**", "!**/dist", "!drizzle/meta"]
   },
   "formatter": {
     "indentStyle": "space",

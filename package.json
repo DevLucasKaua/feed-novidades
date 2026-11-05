@@ -16,7 +16,8 @@
     "format": "biome check --write .",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "seed": "tsx --env-file-if-exists=.env src/db/seed.ts"
+    "seed": "tsx --env-file-if-exists=.env src/db/seed.ts",
+    "web": "npm --prefix web run dev"
   },
   "dependencies": {
     "@fastify/swagger": "^9.9.3",
