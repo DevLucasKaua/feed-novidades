@@ -1,4 +1,4 @@
-import '@fontsource-variable/inter';
+import '@fontsource-variable/outfit';
 import './estilos.css';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
