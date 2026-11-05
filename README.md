@@ -26,7 +26,7 @@ npm --prefix web ci
 npm run web
 ```
 
-Abra `http://localhost:5173` e clique em **Preparar cenário**. O painel à direita mostra cada chamada real à API, com método, status, tempo e JSON, e o item **Testar respostas de erro** dispara os casos 400, 404, 409 e 422.
+Abra `http://localhost:5173` e clique em **Preparar cenário**. O **Painel** resume o feed do cliente ativo e o tempo das chamadas. As demais páginas cobrem feed, lojas e clientes. **Chamadas** mostra cada requisição real, com método, status, tempo e JSON, e **Respostas de erro** dispara os casos 400, 404, 409 e 422.
 
 **Recomeçar** limpa só o que está no navegador. Os dados continuam no banco.
 
