@@ -38,7 +38,7 @@ npm --prefix web ci
 npm run web
 ```
 
-Depois abra `http://localhost:5173`.
+Depois abra `http://localhost:5173`. Se essa porta estiver ocupada, o Vite usa a seguinte e mostra o endereço no terminal.
 
 ### Primeiro uso
 
