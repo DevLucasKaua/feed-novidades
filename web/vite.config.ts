@@ -1,11 +1,14 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 
-const API = 'http://localhost:3000';
-const proxy = Object.fromEntries(['/lojas', '/clientes', '/documentation'].map((r) => [r, API]));
+export default defineConfig(({ mode }) => {
+  const { PORT = '3000' } = loadEnv(mode, '..', 'PORT');
+  const api = `http://localhost:${PORT}`;
+  const proxy = Object.fromEntries(['/lojas', '/clientes', '/documentation'].map((r) => [r, api]));
 
-export default defineConfig({
-  plugins: [react()],
-  server: { port: 5173, proxy },
-  preview: { port: 5173, proxy },
+  return {
+    plugins: [react()],
+    server: { port: 5173, proxy },
+    preview: { port: 5173, proxy },
+  };
 });
