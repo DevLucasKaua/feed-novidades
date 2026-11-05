@@ -1,10 +1,16 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { dataHora, errosPossiveis, seguirParams, textoObrigatorio } from '../../http/schemas.js';
+import {
+  dataHora,
+  errosPossiveis,
+  NOME_MAXIMO,
+  seguirParams,
+  textoObrigatorio,
+} from '../../http/schemas.js';
 import { criarCliente, deixarDeSeguirLoja, seguirLoja } from './servico.js';
 
 const novoCliente = z.object({
-  nome: textoObrigatorio('nome'),
+  nome: textoObrigatorio('nome', NOME_MAXIMO),
   email: z.string('email é obrigatório').trim().toLowerCase().pipe(z.email('email inválido')),
 });
 

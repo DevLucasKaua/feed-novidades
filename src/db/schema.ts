@@ -13,18 +13,26 @@ import {
 const id = () => bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity();
 const criadoEm = () => timestamp('criado_em', { withTimezone: true }).notNull().defaultNow();
 
-export const lojas = pgTable('lojas', {
-  id: id(),
-  nome: text('nome').notNull(),
-  criadoEm: criadoEm(),
-});
+export const lojas = pgTable(
+  'lojas',
+  {
+    id: id(),
+    nome: text('nome').notNull(),
+    criadoEm: criadoEm(),
+  },
+  (t) => [check('lojas_nome_tamanho', sql`char_length(${t.nome}) between 1 and 100`)],
+);
 
-export const clientes = pgTable('clientes', {
-  id: id(),
-  nome: text('nome').notNull(),
-  email: text('email').notNull().unique('clientes_email_unico'),
-  criadoEm: criadoEm(),
-});
+export const clientes = pgTable(
+  'clientes',
+  {
+    id: id(),
+    nome: text('nome').notNull(),
+    email: text('email').notNull().unique('clientes_email_unico'),
+    criadoEm: criadoEm(),
+  },
+  (t) => [check('clientes_nome_tamanho', sql`char_length(${t.nome}) between 1 and 100`)],
+);
 
 export const seguindo = pgTable(
   'seguindo',

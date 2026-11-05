@@ -26,6 +26,7 @@ describe('POST /clientes', () => {
     ['sem nome', { email: cliente.email }],
     ['sem email', { nome: cliente.nome }],
     ['com email inválido', { ...cliente, email: 'nao-e-email' }],
+    ['com nome de 101 caracteres', { ...cliente, nome: 'a'.repeat(101) }],
   ])('rejeita cliente %s', async (_, corpo) => {
     esperarErro(await post('/clientes', corpo), 422, 'VALIDACAO');
   });
