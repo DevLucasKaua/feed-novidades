@@ -12,7 +12,14 @@ import {
   Store,
   Users,
 } from 'lucide-react';
-import { type ComponentType, useEffect, useState } from 'react';
+import {
+  type ComponentType,
+  type CSSProperties,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Avatar } from './componentes/comum';
 import {
   BotaoCenario,
@@ -78,6 +85,34 @@ function usePagina() {
   return [pagina, ir] as const;
 }
 
+function useIndicador(pagina: NomePagina) {
+  const navegacao = useRef<HTMLElement>(null);
+  const [posicao, setPosicao] = useState<CSSProperties>();
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: o item ativo muda junto com a página
+  useLayoutEffect(() => {
+    const elemento = navegacao.current;
+    if (!elemento) return;
+
+    const medir = () => {
+      const ativo = elemento.querySelector<HTMLElement>('a[aria-current="page"]');
+      if (!ativo) return;
+      setPosicao({
+        width: ativo.offsetWidth,
+        height: ativo.offsetHeight,
+        transform: `translate(${ativo.offsetLeft}px, ${ativo.offsetTop}px)`,
+      });
+    };
+
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(elemento);
+    return () => observador.disconnect();
+  }, [pagina]);
+
+  return [navegacao, posicao] as const;
+}
+
 function Marca() {
   return (
     <span className="marca">
@@ -93,10 +128,13 @@ function Marca() {
 }
 
 function BarraLateral({ demo, pagina }: { demo: Demo; pagina: NomePagina }) {
+  const [navegacao, posicao] = useIndicador(pagina);
+
   return (
     <aside className="lateral">
       <Marca />
-      <nav aria-label="Páginas">
+      <nav ref={navegacao} aria-label="Páginas">
+        <span className="indicador-navegacao" style={posicao} />
         {GRUPOS.map((grupo) => (
           <div key={grupo.nome}>
             <h2>{grupo.nome}</h2>
@@ -213,8 +251,11 @@ function BarraSuperior(props: {
 
 function NavegacaoMovel({ pagina }: { pagina: NomePagina }) {
   const curtos: Partial<Record<NomePagina, string>> = { erros: 'Erros' };
+  const [navegacao, posicao] = useIndicador(pagina);
+
   return (
-    <nav className="navegacao-movel" aria-label="Páginas">
+    <nav ref={navegacao} className="navegacao-movel" aria-label="Páginas">
+      <span className="indicador-navegacao" style={posicao} />
       {ITENS.map(({ id, nome, icone: Icone }) => (
         <a
           key={id}
