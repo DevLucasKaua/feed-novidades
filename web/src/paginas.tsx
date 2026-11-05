@@ -130,7 +130,11 @@ export function PaginaPainel({ demo, ir }: PropsPagina) {
         <Cartao
           className="bloco-4"
           titulo="Tempo das chamadas"
-          subtitulo={`Últimas ${Math.min(21, demo.chamadas.length) || 21}`}
+          subtitulo={
+            demo.chamadas.length === 1
+              ? 'Última chamada'
+              : `Últimas ${Math.min(21, demo.chamadas.length) || 21}`
+          }
         >
           <GraficoChamadas demo={demo} />
         </Cartao>
