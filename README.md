@@ -13,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-A API sobe em `http://localhost:3000` e aplica as migrations sozinha ao iniciar.
+A API sobe em `http://localhost:3000` e aplica as migrations sozinha ao iniciar. A documentação interativa fica em `http://localhost:3000/documentation`, e a especificação OpenAPI em `/documentation/json`.
 
 Para ter dados de exemplo, rode `npm run seed` em outro terminal. O comando **apaga os dados do banco de desenvolvimento** e cria 5 lojas, 3 clientes e 25 novidades. O cliente 1 segue as lojas 1, 2 e 3, e o cliente 3 não segue nenhuma.
 
@@ -194,10 +194,12 @@ O horário do cursor é lido do banco como texto porque o PostgreSQL guarda micr
 - **Drizzle:** schema tipado e migrations em SQL legível, com pouca abstração. O `LATERAL` é suportado pelo construtor de consultas, então o feed não precisou de SQL solto nem de mapeamento manual.
 - **Vitest contra PostgreSQL real:** as regras principais dependem de restrições e da ordenação do banco, que um mock não verificaria.
 - **Biome:** lint e formatação numa só ferramenta.
+- **OpenAPI gerada dos schemas Zod:** a documentação usa os mesmos schemas que validam entrada e saída, então não tem como divergir do comportamento real.
+- **GitHub Actions:** lint, tipos, build e testes a cada PR, em Node 22.12, a versão mínima, e 26.
 
 ## O que ficou de fora e o que faria com mais tempo
 
-O diferencial pendente está nas [issues](https://github.com/DevLucasKaua/feed-novidades/issues?q=label%3Adiferencial): OpenAPI.
+Os quatro diferenciais do enunciado foram feitos: deixar de seguir, paginação por cursor, OpenAPI e CI.
 
 Limites conhecidos e próximos passos:
 

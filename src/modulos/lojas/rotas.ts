@@ -1,6 +1,12 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { idParams, textoObrigatorio } from '../../http/schemas.js';
+import {
+  dataHora,
+  errosPossiveis,
+  idParams,
+  novidadeBase,
+  textoObrigatorio,
+} from '../../http/schemas.js';
 import { criarLoja, publicarNovidade } from './servico.js';
 
 const TEXTO_MAXIMO = 500;
@@ -24,16 +30,34 @@ const novaNovidade = z.object({
     .nullish(),
 });
 
+const loja = z.object({ id: z.number(), nome: z.string(), criadoEm: dataHora });
+const novidadePublicada = novidadeBase.extend({ lojaId: z.number() });
+
 export const rotasLojas: FastifyPluginAsyncZod = async (app) => {
   app.post(
     '/lojas',
-    { schema: { body: z.object({ nome: textoObrigatorio('nome') }) } },
+    {
+      schema: {
+        tags: ['Lojas'],
+        summary: 'Cria uma loja',
+        body: z.object({ nome: textoObrigatorio('nome') }),
+        response: { 201: loja, ...errosPossiveis(400, 422) },
+      },
+    },
     async (request, reply) => reply.status(201).send(await criarLoja(request.body.nome)),
   );
 
   app.post(
     '/lojas/:id/novidades',
-    { schema: { params: idParams, body: novaNovidade } },
+    {
+      schema: {
+        tags: ['Lojas'],
+        summary: 'Publica uma novidade',
+        params: idParams,
+        body: novaNovidade,
+        response: { 201: novidadePublicada, ...errosPossiveis(400, 404, 422) },
+      },
+    },
     async (request, reply) =>
       reply.status(201).send(await publicarNovidade(request.params.id, request.body)),
   );
